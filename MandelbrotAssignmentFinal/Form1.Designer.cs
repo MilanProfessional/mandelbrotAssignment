@@ -243,6 +243,7 @@
             this.Name = "Fractal";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Mandelbrot";
+            this.Load += new System.EventHandler(this.Fractal_Load);
             this.contextMenuStrip1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

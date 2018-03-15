@@ -35,6 +35,7 @@ namespace MandelbrotAssignmentFinal
         private Graphics g1;
         private Cursor c1, c2;
         private HSB HSBcol = new HSB();
+        private bool clicked;
 
 
 
@@ -107,24 +108,46 @@ namespace MandelbrotAssignmentFinal
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (action)
+            clicked = true;
             {
-                xs = e.X;
-                ys = e.Y;
+                action = true;
+
+                if (action)
+                {
+                    xs = e.X;
+                    ys = e.Y;
+                }
             }
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (action)
+            if (clicked)
             {
-                xe = e.X;
-                ye = e.Y;
-                rectangle = true;
+                if (action)
+                {
+                    xe = e.X;
+                    ye = e.Y;
+                    rectangle = true;
 
-                update();
-                Refresh();
+                    update();
+                    
+                }
+
             }
+        }
+
+        private void Fractal_Load(object sender, EventArgs e)
+        {
+            //DialogResult dialogResult = MessageBox.Show("Do You want to quit ?", "Quit", MessageBoxButtons.YesNo);
+            //if (dialogResult == DialogResult.Yes)
+            //{
+            //    this.Close();
+            //}
+            //else if (dialogResult == DialogResult.No)
+            //{
+
+            //}
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -162,6 +185,8 @@ namespace MandelbrotAssignmentFinal
                 yzoom = (yende - ystart) / (double)y1;
                 mandelbrot();
                 rectangle = false;
+               // action = false;
+                clicked = false;
                 update();
             }
         }

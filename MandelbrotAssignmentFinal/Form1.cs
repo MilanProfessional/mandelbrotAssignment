@@ -85,7 +85,6 @@ namespace MandelbrotAssignmentFinal
             g.DrawImage(picture, 0, 0);
             if (rectangle)
             {
-                //g.setColor(Color.white);
                 Pen mypen = new Pen(Color.White, 1);
                 if (xs < xe)
                 {
@@ -137,17 +136,18 @@ namespace MandelbrotAssignmentFinal
             }
         }
 
-        private void Fractal_Load(object sender, EventArgs e)
+        private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //DialogResult dialogResult = MessageBox.Show("Do You want to quit ?", "Quit", MessageBoxButtons.YesNo);
-            //if (dialogResult == DialogResult.Yes)
-            //{
-            //    this.Close();
-            //}
-            //else if (dialogResult == DialogResult.No)
-            //{
+            Fractal clone = new Fractal();
+            clone.Show();
+        }
 
-            //}
+        private void restartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            start();
+            mandelbrot();
+            rectangle = false;
+            update();
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -193,6 +193,7 @@ namespace MandelbrotAssignmentFinal
 
         public void stop()
         {
+            
         }
 
         public void paint(Graphics g)
@@ -212,8 +213,8 @@ namespace MandelbrotAssignmentFinal
             float h, b, alt = 0.0f;
 
             action = false;
-            //pictureBox1.Cursor = c1;
-            //showStatus("Mandelbrot-Set will be produced - please wait...");
+            textBox1.Text = "Mandelbrot-Set will be produced - please wait...";
+            textBox1.Enabled = false;
             for (x = 0; x < x1; x += 2)
                 for (y = 0; y < y1; y++)
                 {
@@ -231,7 +232,8 @@ namespace MandelbrotAssignmentFinal
                     }
                     g1.DrawLine (pen, x, y, x + 1, y);
                 }
-            //showStatus("Mandelbrot-Set ready - please select zoom area with pressed mouse.");
+            textBox1.Text= "Mandelbrot-Set ready - please select to zoom.";
+            textBox1.Enabled = false;
             
             action = true;
         }
@@ -275,37 +277,14 @@ namespace MandelbrotAssignmentFinal
         {
         }
 
-        //public void mouseDragged(object sender, EventArgs e)
-        //{
-        //    e.consume();
-        //    if (action)
-        //    {
-        //        xe = e.getX();
-        //        ye = e.getY();
-        //        rectangle = true;
-        //        repaint();
-        //    }
-        //}
-
         public void mouseMoved(object sender, EventArgs e)
         {
         }
 
         public String getAppletInfo()
         {
-            return "fractal.class - Mandelbrot Set a Java Applet by Eckhard Roessel 2000-2001";
+            return "fractal conversion by milan";
         }
-
-
-
-
-
-
-
-
-
-
-
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {

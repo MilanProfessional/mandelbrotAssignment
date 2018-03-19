@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +16,11 @@ namespace MandelbrotAssignmentFinal
     {
         public Fractal()
         {
+            //SX = Convert.ToDouble(readState()[0]);
+            //SY = Convert.ToDouble(readState()[1]);
+            //EX = Convert.ToDouble(readState()[2]);
+            //EY = Convert.ToDouble(readState()[3]);
+
             InitializeComponent();
             init();
             start();
@@ -36,6 +43,7 @@ namespace MandelbrotAssignmentFinal
         private Cursor c1, c2;
         private HSB HSBcol = new HSB();
         private bool clicked;
+        private string texts;
 
 
 
@@ -188,12 +196,57 @@ namespace MandelbrotAssignmentFinal
                // action = false;
                 clicked = false;
                 update();
+                StreamWriter filewrite = new StreamWriter("statesaver.txt");
+                
+                filewrite.Write(xende + Environment.NewLine);
+                filewrite.Write(yende + Environment.NewLine);
+                filewrite.Write(xstart + Environment.NewLine);
+                filewrite.Write(ystart);
+                filewrite.Close();
+
+
+            }
+        }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+            stop();
+
+        }
+
+        private void printDocument_PrintPage(object sender, PrintPageEventArgs e)
+        {
+            e.Graphics.DrawImage(pictureBox1.Image, 0, 0);
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PrintDocument p = new PrintDocument();
+            p.PrintPage += new PrintPageEventHandler(printDocument_PrintPage);
+            p.Print();
+        }
+
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            Application.Restart();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog f = new SaveFileDialog();
+            f.Filter = "JPG(*.JPG) | *.JPG";
+            if (f.ShowDialog() == DialogResult.OK)
+            {
+                picture.Save(f.FileName);
             }
         }
 
         public void stop()
         {
-            
+            pictureBox1.Image = null;
+            pictureBox1.Invalidate();
         }
 
         public void paint(Graphics g)
@@ -213,8 +266,8 @@ namespace MandelbrotAssignmentFinal
             float h, b, alt = 0.0f;
 
             action = false;
-            textBox1.Text = "Mandelbrot-Set will be produced - please wait...";
-            textBox1.Enabled = false;
+            //textBox1.Text = "Mandelbrot-Set will be produced - please wait...";
+            //textBox1.Enabled = false;
             for (x = 0; x < x1; x += 2)
                 for (y = 0; y < y1; y++)
                 {
@@ -254,6 +307,8 @@ namespace MandelbrotAssignmentFinal
         }
 
         private void initvalues() // reset start values
+
+
         {
             xstart = SX;
             ystart = SY;
@@ -261,25 +316,82 @@ namespace MandelbrotAssignmentFinal
             yende = EY;
             if ((float)((xende - xstart) / (yende - ystart)) != xy)
                 xstart = xende - (yende - ystart) * (double)xy;
+           // readState();
+            //mandel();
+
+           
+
+            //StreamReader s = File.OpenText("statesaver.txt");
+            //string text = s.ReadLine();
+            //int count = 0;
+            //String[] array = new String[4];
+            //while (true)
+            //{
+            //    {
+            //        count++;
+
+            //        if (count == 1)
+            //        {
+
+            //            array[count - 1] = text;
+            //        }
+            //        if (count == 2)
+            //        {
+
+            //            array[count - 1] = text;
+            //        }
+            //        if (count == 3)
+            //        {
+
+            //            array[count - 1] = text;
+            //        }
+            //        if (count == 4)
+            //        {
+
+            //            array[count - 1] = text;
+            //        }
+
+            //    }
+            //    Console.WriteLine(array[2]);
+
+
+
+            //}
         }
+
+        private void mandel()
+        {
+            
+            double a = Convert.ToDouble(readState()[0]);
+            double b = Convert.ToDouble(readState()[1]);
+            double c= Convert.ToDouble(readState()[2]);
+            double d = Convert.ToDouble(readState()[3]);
+            xstart = a;
+            ystart = b;
+            xende = c;
+            yende = d;
+        }
+
+        private List<string> readState()
+        {
+            //string path = Directory.GetCurrentDirectory() + "\\statesaver.txt";
+
+            List<string> l = new List<string>();
+
+            using (StreamReader sr = File.OpenText("statesaver.txt"))
+            {
+                string s = "";
+                while ((s = sr.ReadLine()) != null)
+                {
+                    l.Add(s);
+                }
+            }
+
+            return l;
+        }
+
 
         
-
-        public void mouseEntered(object sender, EventArgs e)
-        {
-        }
-
-        public void mouseExited(object sender, EventArgs e)
-        {
-        }
-
-        public void mouseClicked(object sender, EventArgs e)
-        {
-        }
-
-        public void mouseMoved(object sender, EventArgs e)
-        {
-        }
 
         public String getAppletInfo()
         {

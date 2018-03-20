@@ -93,16 +93,19 @@ namespace MandelbrotAssignmentFinal
             try
             {
                 g = pictureBox1.CreateGraphics();
+                g.DrawImage(picture, 0, 0);
             }
             catch (ObjectDisposedException ex)
             {
                 Console.WriteLine(ex);
-            }
-            // Graphics g = pictureBox1.CreateGraphics();
-            try
+            } catch(NullReferenceException ex)
             {
-                g.DrawImage(picture, 0, 0);
-                if (rectangle)
+                Console.WriteLine(ex);
+            }
+
+            
+            
+            if (rectangle)
                 {
                     Pen mypen = new Pen(Color.White, 1);
                     if (xs < xe)
@@ -116,11 +119,7 @@ namespace MandelbrotAssignmentFinal
                         else g.DrawRectangle(new Pen(Color.White), xe, ye, (xs - xe), (ys - ye));
                     }
                 }
-            }
-            catch (System.NullReferenceException ex)
-            {
-                Console.WriteLine(ex);
-            }
+            
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
@@ -177,6 +176,7 @@ namespace MandelbrotAssignmentFinal
             {
                 reloadToolStripMenuItem_Click(sender, e);
                 isFirstTime = false;
+                Application.Restart();
 
             }
             else if (dialogResult == DialogResult.No)
@@ -300,7 +300,11 @@ namespace MandelbrotAssignmentFinal
         {
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
-           // pictureBox1.Dispose();
+            pictureBox1.Dispose();
+            textBox1.Text = "Mandelbrot disabled. Click File and Restart to restart mandelbrot";
+            textBox1.Enabled = false;
+
+
             //pictureBox1 = null;
         }
 

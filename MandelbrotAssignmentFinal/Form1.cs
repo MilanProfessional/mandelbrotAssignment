@@ -32,7 +32,7 @@ namespace MandelbrotAssignmentFinal
         private readonly double SX = -2.025; // start value real
         private readonly double SY = -1.125; // start value imaginary
         private readonly double EX = 0.6;    // end value real
-        private readonly double EY = 1.125;  // end value imaginary
+        private readonly double EY = 1.125;  // end value imaginarys
         private static int x1, y1, xs, ys, xe, ye;
         private static double xstart, ystart, xende, yende, xzoom, yzoom;
         private static bool action, rectangle, finished;
@@ -42,7 +42,7 @@ namespace MandelbrotAssignmentFinal
         private Graphics g1;
         private Cursor c1, c2;
         private HSB HSBcol = new HSB();
-        private bool clicked;
+        private bool clicked, isFirstTime;
         private string texts;
 
 
@@ -50,7 +50,7 @@ namespace MandelbrotAssignmentFinal
         public void init() // all instances will be prepared
         {
             //HSBcol = new HSB();
-            
+            isFirstTime = true;
             finished = false;
             x1 = pictureBox1.Width;
             y1 = pictureBox1.Height;
@@ -89,21 +89,37 @@ namespace MandelbrotAssignmentFinal
 
         public void update()
         {
-            Graphics g = pictureBox1.CreateGraphics();
-            g.DrawImage(picture, 0, 0);
-            if (rectangle)
+            Graphics g = null;
+            try
             {
-                Pen mypen = new Pen(Color.White, 1);
-                if (xs < xe)
+                g = pictureBox1.CreateGraphics();
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine(ex);
+            }
+            // Graphics g = pictureBox1.CreateGraphics();
+            try
+            {
+                g.DrawImage(picture, 0, 0);
+                if (rectangle)
                 {
-                    if (ys < ye) g.DrawRectangle(new Pen(Color.White), xs, ys, (xe - xs), (ye - ys));
-                    else g.DrawRectangle(new Pen(Color.White), xs, ye, (xe - xs), (ys - ye));
+                    Pen mypen = new Pen(Color.White, 1);
+                    if (xs < xe)
+                    {
+                        if (ys < ye) g.DrawRectangle(new Pen(Color.White), xs, ys, (xe - xs), (ye - ys));
+                        else g.DrawRectangle(new Pen(Color.White), xs, ye, (xe - xs), (ys - ye));
+                    }
+                    else
+                    {
+                        if (ys < ye) g.DrawRectangle(new Pen(Color.White), xe, ys, (xs - xe), (ye - ys));
+                        else g.DrawRectangle(new Pen(Color.White), xe, ye, (xs - xe), (ys - ye));
+                    }
                 }
-                else
-                {
-                    if (ys < ye) g.DrawRectangle(new Pen(Color.White), xe, ys, (xs - xe), (ye - ys));
-                    else g.DrawRectangle(new Pen(Color.White), xe, ye, (xs - xe), (ys - ye));
-                }
+            }
+            catch (System.NullReferenceException ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
@@ -148,14 +164,26 @@ namespace MandelbrotAssignmentFinal
         {
             Fractal clone = new Fractal();
             clone.Show();
+            isFirstTime = false;
+           
+
+
         }
 
         private void restartToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            start();
-            mandelbrot();
-            rectangle = false;
-            update();
+            DialogResult dialogResult = MessageBox.Show("Do You want to Restart Mandelbrot from initial ?", "Restart", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                reloadToolStripMenuItem_Click(sender, e);
+                isFirstTime = false;
+
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                Application.Restart();
+            }
+
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -196,13 +224,18 @@ namespace MandelbrotAssignmentFinal
                // action = false;
                 clicked = false;
                 update();
+                isFirstTime = false;
                 StreamWriter filewrite = new StreamWriter("statesaver.txt");
                 
-                filewrite.Write(xende + Environment.NewLine);
-                filewrite.Write(yende + Environment.NewLine);
+               
                 filewrite.Write(xstart + Environment.NewLine);
-                filewrite.Write(ystart);
+                filewrite.Write(ystart + Environment.NewLine);
+                filewrite.Write(xende + Environment.NewLine);
+                filewrite.Write(yende);
                 filewrite.Close();
+
+                
+                
 
 
             }
@@ -220,6 +253,11 @@ namespace MandelbrotAssignmentFinal
             e.Graphics.DrawImage(pictureBox1.Image, 0, 0);
         }
 
+        private void infoToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            getInfo();
+        }
+
         private void printToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PrintDocument p = new PrintDocument();
@@ -230,7 +268,22 @@ namespace MandelbrotAssignmentFinal
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            Application.Restart();
+            //Application.Restart();
+            isFirstTime = false;
+            start();
+            mandelbrot();
+            rectangle = false;
+            update();
+            StreamWriter filewrite = new StreamWriter("statesaver.txt");
+            filewrite.Write("-2.025" + Environment.NewLine);
+            filewrite.Write("-1.125" + Environment.NewLine);
+            filewrite.Write("0.6" + Environment.NewLine);
+            filewrite.Write("1.125");
+            filewrite.Close();
+
+           
+
+
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,6 +300,8 @@ namespace MandelbrotAssignmentFinal
         {
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
+           // pictureBox1.Dispose();
+            //pictureBox1 = null;
         }
 
         public void paint(Graphics g)
@@ -310,16 +365,46 @@ namespace MandelbrotAssignmentFinal
 
 
         {
-            xstart = SX;
-            ystart = SY;
-            xende = EX;
-            yende = EY;
+            //Console.WriteLine( "Hello");
+            if (isFirstTime == true)
+            {
+                List<string> coordinate = new List<string>();
+
+                using (StreamReader sr = File.OpenText("statesaver.txt"))
+                {
+                    string s = "";
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        coordinate.Add(s);
+                    }
+                }
+
+                xstart = Double.Parse(coordinate[0]);
+                ystart = Double.Parse(coordinate[1]);
+                xende = Double.Parse(coordinate[2]);
+                yende = Double.Parse(coordinate[3]);
+
+                //Console.WriteLine(xstart + "Hello");
+
+
+            }
+            else {
+                xstart = SX;
+                ystart = SY;
+                xende = EX;
+                yende = EY;
+               
+            }
             if ((float)((xende - xstart) / (yende - ystart)) != xy)
                 xstart = xende - (yende - ystart) * (double)xy;
-           // readState();
-            //mandel();
+           
 
            
+
+            // readState();
+            //mandel();
+
+
 
             //StreamReader s = File.OpenText("statesaver.txt");
             //string text = s.ReadLine();
@@ -359,43 +444,48 @@ namespace MandelbrotAssignmentFinal
             //}
         }
 
-        private void mandel()
-        {
+        //private void mandel()
+        //{
             
-            double a = Convert.ToDouble(readState()[0]);
-            double b = Convert.ToDouble(readState()[1]);
-            double c= Convert.ToDouble(readState()[2]);
-            double d = Convert.ToDouble(readState()[3]);
-            xstart = a;
-            ystart = b;
-            xende = c;
-            yende = d;
-        }
+        //    double SX = Convert.ToDouble(readState()[0]);
+        //    double SY = Convert.ToDouble(readState()[1]);
+        //    double EX= Convert.ToDouble(readState()[2]);
+        //    double EY = Convert.ToDouble(readState()[3]);
+            
 
-        private List<string> readState()
-        {
-            //string path = Directory.GetCurrentDirectory() + "\\statesaver.txt";
+        //    xstart = SX;
+        //    ystart = SY;
+        //    xende = EY;
+        //    yende = EX;
 
-            List<string> l = new List<string>();
+        //    Console.WriteLine(SX + "hello");
 
-            using (StreamReader sr = File.OpenText("statesaver.txt"))
-            {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
-                {
-                    l.Add(s);
-                }
-            }
+        //}
 
-            return l;
-        }
+        //private List<string> readState()
+        //{
+        //    //string path = Directory.GetCurrentDirectory() + "\\statesaver.txt";
+
+        //    List<string> coordinate = new List<string>();
+
+        //    using (StreamReader sr = File.OpenText("statesaver.txt"))
+        //    {
+        //        string s = "";
+        //        while ((s = sr.ReadLine()) != null)
+        //        {
+        //            coordinate.Add(s);
+        //        }
+        //    }
+
+        //    return coordinate;
+        //}
 
 
         
 
-        public String getAppletInfo()
+        public void getInfo()
         {
-            return "fractal conversion by milan";
+            MessageBox.Show ("Mandelbrot by Milan");
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)

@@ -51,6 +51,7 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.colorPelatteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -203,7 +204,8 @@
             this.propertiesToolStripMenuItem1.BackColor = System.Drawing.Color.SkyBlue;
             this.propertiesToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.printToolStripMenuItem,
-            this.cloneToolStripMenuItem});
+            this.cloneToolStripMenuItem,
+            this.colorPelatteToolStripMenuItem});
             this.propertiesToolStripMenuItem1.Name = "propertiesToolStripMenuItem1";
             this.propertiesToolStripMenuItem1.Size = new System.Drawing.Size(80, 21);
             this.propertiesToolStripMenuItem1.Text = "Properties";
@@ -213,7 +215,7 @@
             // 
             this.printToolStripMenuItem.BackColor = System.Drawing.Color.SkyBlue;
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.printToolStripMenuItem.Text = "Print";
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
@@ -221,7 +223,7 @@
             // 
             this.cloneToolStripMenuItem.BackColor = System.Drawing.Color.SkyBlue;
             this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.cloneToolStripMenuItem.Text = "Clone";
             this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
             // 
@@ -255,6 +257,14 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(464, 20);
             this.textBox1.TabIndex = 4;
+            // 
+            // colorPelatteToolStripMenuItem
+            // 
+            this.colorPelatteToolStripMenuItem.BackColor = System.Drawing.Color.SkyBlue;
+            this.colorPelatteToolStripMenuItem.Name = "colorPelatteToolStripMenuItem";
+            this.colorPelatteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.colorPelatteToolStripMenuItem.Text = "Color Palette";
+            this.colorPelatteToolStripMenuItem.Click += new System.EventHandler(this.colorPelatteToolStripMenuItem_Click);
             // 
             // Fractal
             // 
@@ -302,6 +312,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ToolStripMenuItem cloneToolStripMenuItem;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ToolStripMenuItem colorPelatteToolStripMenuItem;
     }
 }
 

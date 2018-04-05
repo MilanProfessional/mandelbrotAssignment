@@ -79,32 +79,22 @@ namespace MandelbrotAssignmentFinal
             gChan = (float)Math.Round(Math.Min(Math.Max(green, 0), 255));
             bChan = (float)Math.Round(Math.Min(Math.Max(blue, 0), 255));
 
-
+            //for Other Color
             if (numbers == 1)
             {
                 rChan = 50;
                 bChan = 200;
             }
-
-            else if (numbers == 2)
-            { rChan = 10; }
-
-
+            else if (numbers == 2) { rChan = 10; }
             else if (numbers == 3) { bChan = 200; }
-
-
             else if (numbers == 4) { bChan = 100; }
-
             else if (numbers == 5) { rChan = 150; }
-
             else if (numbers == 6)
             {
                 rChan = 10;
                 bChan = 150;
             }
-
             else if (numbers == 7) { rChan = 255; }
-
             else if (numbers == 8) { bChan = 200; }
 
         }

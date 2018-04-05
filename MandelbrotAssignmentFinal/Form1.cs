@@ -45,7 +45,7 @@ namespace MandelbrotAssignmentFinal
         private Image tempPicture;
         private bool isFirst;
         int num1, num3, num2;
-
+        private int num = 0;
 
 
 
@@ -106,7 +106,19 @@ namespace MandelbrotAssignmentFinal
             initvalues();
             xzoom = (xende - xstart) / (double)x1;
             yzoom = (yende - ystart) / (double)y1;
-            mandelbrot();
+
+            //int num = 0;
+            //if (isFirstTime == true) { } pakha hai
+            using (StreamReader st = File.OpenText("colorstate.txt"))
+            {
+                int s = 0;
+                while ((s = Convert.ToInt32(st.ReadLine())) != 0)
+                {
+                    num = s;
+                }
+            }
+
+            mandelbrot(state_Of_Color_Reader());
             //randomPalette();
         }
 
@@ -185,7 +197,7 @@ namespace MandelbrotAssignmentFinal
             
         }
 
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        private void pictureBox1_Paint(object sender, PaintEventArgs e) //Drawing mandelbrot
         {
             Graphics obj = e.Graphics;
             obj.DrawImage(picture, new Point(0, 0));
@@ -222,7 +234,7 @@ namespace MandelbrotAssignmentFinal
             }
         }
 
-        private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
+        private void cloneToolStripMenuItem_Click(object sender, EventArgs e) // Creating clone // Opens another forms
         {
             Fractal clone = new Fractal();
             clone.Show();
@@ -232,7 +244,7 @@ namespace MandelbrotAssignmentFinal
 
         }
 
-        private void restartToolStripMenuItem_Click(object sender, EventArgs e)
+        private void restartToolStripMenuItem_Click(object sender, EventArgs e) // Restarting Mandelbrot
         {
             DialogResult dialogResult = MessageBox.Show("Do You want to Restart Mandelbrot from initial ?", "Restart", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
@@ -282,15 +294,15 @@ namespace MandelbrotAssignmentFinal
                 }
                 xzoom = (xende - xstart) / (double)x1;
                 yzoom = (yende - ystart) / (double)y1;
-                mandelbrot();
+                mandelbrot(state_Of_Color_Reader());
                 rectangle = false;
                // action = false;
                 clicked = false;
                 update();
                 isFirstTime = false;
-                StreamWriter filewrite = new StreamWriter("statesaver.txt");
+                StreamWriter filewrite = new StreamWriter("statesaver.txt"); // State Saving
                 
-               
+               //Saving Coordinates
                 filewrite.Write(xstart + Environment.NewLine);
                 filewrite.Write(ystart + Environment.NewLine);
                 filewrite.Write(xende + Environment.NewLine);
@@ -304,7 +316,7 @@ namespace MandelbrotAssignmentFinal
             }
         }
         private int TimeChange = 1;
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)//Color cycling using timer // Algorithm
         {
             TimeChange++;
 
@@ -319,65 +331,92 @@ namespace MandelbrotAssignmentFinal
             }
         }
 
-        private void startToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void startToolStripMenuItem1_Click(object sender, EventArgs e) // Color Cycle // Animation Start
         {
+
             
-            timer1.Start();
+            timer1.Start(); //statrs timer
             startToolStripMenuItem1.Enabled = false;
             stopToolStripMenuItem1.Enabled = true;
 
 
         }
 
-        private void stopToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void stopToolStripMenuItem1_Click(object sender, EventArgs e) // Color Cycle // Animation Stop
         {
-            timer1.Stop();
+            Random rand = new Random();
+            int num = rand.Next(1, 8);
+            using (StreamWriter sw = File.CreateText("colorstate.txt"))
+            {
+                sw.WriteLine(num);
+            }
+
+            timer1.Stop(); // stops timer
             stopToolStripMenuItem1.Enabled = false;
             startToolStripMenuItem1.Enabled = true;
 
+
+            mandelbrot(num);
+            update();
+
         }
 
-       
-
-        private void colorPelatteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void howToToolStripMenuItem_Click(object sender, EventArgs e) //Opens Message Box for user knowledge about application
         {
+            MessageBox.Show("File > Restart: To start the Stopped Mandelbrot." + Environment.NewLine +
+                          "File > Reload: To reload Mandelbrot from initial." + Environment.NewLine +
+                          "File > Stop: To stop the Mandelbrot Picture." + Environment.NewLine +
+                          "File > Save: To save it as a Image File." + Environment.NewLine +
+                          "Properties > Print: To print the Image File as required format." + Environment.NewLine +
+                          "Properties > Clone: To make a clone of Mandelbrot." + Environment.NewLine +
+                          "Properties > Color Pallete: To change the color of Mandelbrot randomly." + Environment.NewLine +
+                          "Properties > Color Cycle > Start: To change color of Mandelbrot automatically" + Environment.NewLine +
+                          "Properties > Color Cycle > Stop: To stop the automatic color change of Mandelbrot." + Environment.NewLine,
+                          "How To Use This Application "
+                          );
+        }
 
+        private void colorPelatteToolStripMenuItem_Click(object sender, EventArgs e) // Changes Color Randomly // After clicked by user
+        {
+            
             Random rand = new Random();
             int num = rand.Next(1, 8);
+
+            state_Of_Color_Writer(num);
 
             mandelbrot(num);
             update();
         }
 
 
-        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e) // Calls Stop method
         {
                stop();
 
         }
 
-        private void printDocument_PrintPage(object sender, PrintPageEventArgs e)
+        private void printDocument_PrintPage(object sender, PrintPageEventArgs e) // Calls print event //Communicates with driver
         {
             e.Graphics.DrawImage(pictureBox1.Image, 0, 0);
         }
 
-        private void infoToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void infoToolStripMenuItem1_Click(object sender, EventArgs e) // calls getinto method
         {
             getInfo();
         }
 
-        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        private void printToolStripMenuItem_Click(object sender, EventArgs e) //Prints the documents
         {
             PrintDocument p = new PrintDocument();
             p.PrintPage += new PrintPageEventHandler(printDocument_PrintPage);
             p.Print();
         }
 
-        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e) // Reloads the mandelbrot in initial state
         {
             isFirstTime = false;
             start();
-            mandelbrot();
+            mandelbrot(0);
             rectangle = false;
             update();
             StreamWriter filewrite = new StreamWriter("statesaver.txt");
@@ -386,19 +425,27 @@ namespace MandelbrotAssignmentFinal
             filewrite.Write("0.6" + Environment.NewLine);
             filewrite.Write("1.125");
             filewrite.Close();
+
+            using (StreamWriter sw = File.CreateText("colorstate.txt"))
+            {
+                sw.WriteLine(0);
+            }
+
+           
+
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e) // Opens save dialog box and saves according to user's instruction
         {
             SaveFileDialog f = new SaveFileDialog();
-            f.Filter = "JPG(*.JPG) | *.JPG| BMP (*.bmp)| *.bmp| PNG(*.png) |*.png";
+            f.Filter = "JPG(*.JPG) | *.JPG| BMP (*.bmp)| *.bmp| PNG(*.png) |*.png"; //Formats 
             if (f.ShowDialog() == DialogResult.OK)
             {
                 picture.Save(f.FileName);
             }
         }
 
-        public void stop()
+        public void stop() // stops picture box1 // Stops Mandelbrot color and other menu Strips
         {
             pictureBox1.Image = null;
             pictureBox1.Invalidate();
@@ -467,9 +514,34 @@ namespace MandelbrotAssignmentFinal
           
         }
 
-        private void colorChange(float h, float b)
+        //private void colorChange(float h, float b)
+        //{
+        //    HSBcol.fromHSB(h * 25, 0.8f * 55, b * 205);
+        //}
+
+        private int state_Of_Color_Reader()
         {
-            HSBcol.fromHSB(h * 25, 0.8f * 55, b * 205);
+            int temp = 0;
+
+            using (StreamReader st = File.OpenText("colorstate.txt"))
+            {
+                int s = 0;
+                while ((s = Convert.ToInt32(st.ReadLine())) != 0)
+                {
+                    temp = s;
+                }
+            }
+
+            return temp;
+        }
+
+        private void state_Of_Color_Writer(int num)
+        {
+            string path = Directory.GetCurrentDirectory() + "\\colorstate.txt";
+            using (StreamWriter sw = File.CreateText(path))
+            {
+                sw.WriteLine(num);
+            }
         }
 
         private float pointcolour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
@@ -514,37 +586,39 @@ namespace MandelbrotAssignmentFinal
 
 
             }
-            else {
+            else
+            {
                 xstart = SX;
                 ystart = SY;
                 xende = EX;
                 yende = EY;
-               
+
             }
             if ((float)((xende - xstart) / (yende - ystart)) != xy)
                 xstart = xende - (yende - ystart) * (double)xy;
-           
 
-           
-            
+
+
+
         }
 
-        
 
 
-        
 
-        public void getInfo()
+
+
+        public void getInfo() // Info about application
         {
             MessageBox.Show ( "Mandelbrot By:" + Environment.NewLine +
                 "Name: Milan Babu Adhikari" + Environment.NewLine +
                 "Email: milanadhikari09@live.com" + Environment.NewLine +
-                "Contact No: +9779803818797" + Environment.NewLine, 
-                "About Developer " 
+                "Contact No.: +9779803818797" + Environment.NewLine +
+                "Developed in: Microsoft Visual Studio 2017 Community" + Environment.NewLine,
+                "Version 1.0.8 Freeware" 
                 );
         }
 
-        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void quitToolStripMenuItem_Click(object sender, EventArgs e) //Quit Message box 
         {
             DialogResult dialogResult = MessageBox.Show("Do You want to quit ?", "Quit", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)

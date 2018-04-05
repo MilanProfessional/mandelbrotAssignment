@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Timers;
 
 namespace MandelbrotAssignmentFinal
 {
@@ -16,17 +17,9 @@ namespace MandelbrotAssignmentFinal
     {
         public Fractal()
         {
-            //SX = Convert.ToDouble(readState()[0]);
-            //SY = Convert.ToDouble(readState()[1]);
-            //EX = Convert.ToDouble(readState()[2]);
-            //EY = Convert.ToDouble(readState()[3]);
-
             InitializeComponent();
             init();
-            randomPalette();
             start();
-            
-
         }
 
       
@@ -50,6 +43,9 @@ namespace MandelbrotAssignmentFinal
         private string texts;
         public static Color[] palette = new Color[6];
         private Image tempPicture;
+        private bool isFirst;
+        int num1, num3, num2;
+
 
 
 
@@ -57,6 +53,7 @@ namespace MandelbrotAssignmentFinal
         {
             //HSBcol = new HSB();
             isFirstTime = true;
+           isFirst = true;
             finished = false;
             x1 = pictureBox1.Width;
             y1 = pictureBox1.Height;
@@ -110,13 +107,10 @@ namespace MandelbrotAssignmentFinal
             xzoom = (xende - xstart) / (double)x1;
             yzoom = (yende - ystart) / (double)y1;
             mandelbrot();
-            randomPalette();
+            //randomPalette();
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
+       
 
         //private void colorCycling()
         //{
@@ -141,20 +135,20 @@ namespace MandelbrotAssignmentFinal
 
         //}
 
-        private void randomPalette()
-        {
-            // TO generate random set of numbers for color
-            Random rn = new Random();
+        //private void randomPalette()
+        //{
+        //    // TO generate random set of numbers for color
+        //    Random rn = new Random();
 
-            // Based on the HSB algorithm there are a total of 6 conditions
-            // The clor will be random as the <code>rn</code> will be used to generate set of colors
-            palette[0] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-            palette[1] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-            palette[2] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-            palette[3] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-            palette[4] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-            palette[5] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
-        }
+        //    // Based on the HSB algorithm there are a total of 6 conditions
+        //    // The clor will be random as the <code>rn</code> will be used to generate set of colors
+        //    palette[0] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255)/*, rn.Next(255)*/);
+        //    palette[1] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
+        //    palette[2] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
+        //    palette[3] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
+        //    palette[4] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
+        //    palette[5] = Color.FromArgb(rn.Next(255), rn.Next(255), rn.Next(255), rn.Next(255));
+        //}
 
         public void update()
         {
@@ -243,10 +237,10 @@ namespace MandelbrotAssignmentFinal
             DialogResult dialogResult = MessageBox.Show("Do You want to Restart Mandelbrot from initial ?", "Restart", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
-                reloadToolStripMenuItem_Click(sender, e);
                 isFirstTime = false;
+                
+                reloadToolStripMenuItem_Click(sender, e);
                 Application.Restart();
-
             }
             else if (dialogResult == DialogResult.No)
             {
@@ -276,7 +270,7 @@ namespace MandelbrotAssignmentFinal
                 }
                 w = (xe - xs);
                 z = (ye - ys);
-                if ((w < 2) && (z < 2)) initvalues();
+                if ((w < 2) && (z < 2))  initvalues();
                 else
                 {
                     if (((float)w > (float)z * xy)) ye = (int)((float)ys + (float)w / xy);
@@ -309,18 +303,56 @@ namespace MandelbrotAssignmentFinal
 
             }
         }
+        private int TimeChange = 1;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            TimeChange++;
+
+            if (TimeChange >= 8)
+            {
+                TimeChange = 1;
+            }
+            else
+            {
+                mandelbrot(TimeChange);
+                update();
+            }
+        }
+
+        private void startToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            
+            timer1.Start();
+            startToolStripMenuItem1.Enabled = false;
+            stopToolStripMenuItem1.Enabled = true;
+
+
+        }
+
+        private void stopToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            timer1.Stop();
+            stopToolStripMenuItem1.Enabled = false;
+            startToolStripMenuItem1.Enabled = true;
+
+        }
+
+       
 
         private void colorPelatteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
-            randomPalette();
-            mandelbrot();
+
+            Random rand = new Random();
+            int num = rand.Next(1, 8);
+
+            mandelbrot(num);
+            update();
         }
+
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
-            stop();
+               stop();
 
         }
 
@@ -343,8 +375,6 @@ namespace MandelbrotAssignmentFinal
 
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            //Application.Restart();
             isFirstTime = false;
             start();
             mandelbrot();
@@ -356,16 +386,12 @@ namespace MandelbrotAssignmentFinal
             filewrite.Write("0.6" + Environment.NewLine);
             filewrite.Write("1.125");
             filewrite.Close();
-
-           
-
-
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog f = new SaveFileDialog();
-            f.Filter = "JPG(*.JPG) | *.JPG";
+            f.Filter = "JPG(*.JPG) | *.JPG| BMP (*.bmp)| *.bmp| PNG(*.png) |*.png";
             if (f.ShowDialog() == DialogResult.OK)
             {
                 picture.Save(f.FileName);
@@ -383,12 +409,8 @@ namespace MandelbrotAssignmentFinal
             reloadToolStripMenuItem.Enabled = false;
             stopToolStripMenuItem.Enabled = false;
             saveToolStripMenuItem.Enabled = false;
-            startToolStripMenuItem.Enabled = false;
+            //startToolStripMenuItem.Enabled = false;
             editToolStripMenuItem1.Enabled = false;
-
-
-
-            //pictureBox1 = null;
         }
 
         public void paint(Graphics g)
@@ -401,15 +423,14 @@ namespace MandelbrotAssignmentFinal
 
         }
 
-
-        private void mandelbrot() // calculate all points
+        
+        private void mandelbrot(int num = 0) // calculate all points
         {
             int x, y;
             float h, b, alt = 0.0f;
 
             action = false;
-            //textBox1.Text = "Mandelbrot-Set will be produced - please wait...";
-            //textBox1.Enabled = false;
+
             for (x = 0; x < x1; x += 2)
                 for (y = 0; y < y1; y++)
                 {
@@ -418,24 +439,37 @@ namespace MandelbrotAssignmentFinal
                     {
                         b = 1.0f - h * h; // brightnes
                                           ///djm added
-                                          Color col2 = HSB.HSBtoRGB(h, 0.8f, b);
-                        HSBcol.fromHSB(h*255, 0.8f*255, b*255); //convert hsb to rgb then make a Java Color
-                                          Color col = Color.FromArgb((int)HSBcol.rChan, (int)HSBcol.gChan, (int)HSBcol.bChan);
-                       pen = new Pen(col);
-                        pen2 = new Pen(col2);
+                        // Color col2 = HSB.HSBtoRGB(h, 0.8f, b);
+                        //  HSBcol.fromHSB(h*20, 0.8f*34, b*255); //convert hsb to rgb then make a Java Color
+                        
+                      
+                        
+                            HSBcol.fromHSB(h * 255, 0.8f * 255, b * 255, num); //convert hsb to rgb then make a Java Color
+                            Color col = Color.FromArgb((int)HSBcol.rChan, (int)HSBcol.gChan, (int)HSBcol.bChan);
+                            pen = new Pen(col);
+
+                       // pen2 = new Pen(col2);
                         //djm end
                         //djm added to convert to RGB from HSB
                         alt = h;
                     }
                     
-                    if (isFirstTime) { g1.DrawLine(pen, x, y, x + 1, y); }
-                    else { g1.DrawLine(pen2, x, y, x + 1, y); }
+                    /*if (isFirstTime)*/  g1.DrawLine(pen, x, y, x + 1, y); 
+                   // else { g1.DrawLine(pen2, x, y, x + 1, y); }
                    
                 }
             textBox1.Text= "Mandelbrot-Set ready - please select to zoom.";
             textBox1.Enabled = false;
             
             action = true;
+            isFirst = false;
+            
+          
+        }
+
+        private void colorChange(float h, float b)
+        {
+            HSBcol.fromHSB(h * 25, 0.8f * 55, b * 205);
         }
 
         private float pointcolour(double xwert, double ywert) // color value from 0.0 to 1.0 by iterations
